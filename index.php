@@ -45,7 +45,7 @@ if (!preg_match('#^/_/([^/?]+)/csv(\?purge=1)?$#', $uri, $matches)) {
 }
 $id = $matches[1];
 $purge = false;
-if ($matches[2]) {
+if (count($matches) >= 3 and $matches[2]) {
     $purge = true;
 }
 
