@@ -61,11 +61,13 @@ $db_name = $matches[4];
 $db = new PDO(sprintf("mysql:host=%s;dbname=%s", $db_ip, $db_name), $db_user, $db_password);
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+$db->prepare("SET NAMES UTF8")->execute();
 if ($purge) {
     $sql = "UPDATE cache SET cache_at = 0 WHERE id = " . $db->quote($id);
     $db->prepare($sql)->execute();
     exit;
 }
+
 
 $sql = "SELECT * FROM cache WHERE id = " . $db->quote($id);
 $stmt = $db->prepare($sql);
