@@ -19,6 +19,7 @@ function getCSV($id, $skip_ethercalc_down = true) {
     $info = curl_getinfo($curl);
     if (200 != $info['http_code']) {
         file_put_contents("/tmp/ethercalc-down", time());
+        error_log("ethercalc down");
         throw new Exception("fetch error: " . curl_error($curl));
     }
     if (file_exists("/tmp/ethercalc-down")) {
