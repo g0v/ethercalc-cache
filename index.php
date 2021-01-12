@@ -10,7 +10,11 @@ function getCSV($id, $skip_ethercalc_down = true) {
     }
     $curl = curl_init("https://ethercalc.net/_/{$id}/csv");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+    if ($skip_ethercalc_down) {
+        curl_setopt($curl, CURLOPT_TIMEOUT, 3);
+    } else {
+        curl_setopt($curl, CURLOPT_TIMEOUT, 20);
+    }
     $content = curl_exec($curl);
     $info = curl_getinfo($curl);
     if (200 != $info['http_code']) {
