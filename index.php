@@ -35,10 +35,14 @@ function printContent($content, $header_note) {
 
 // check URI must be /_/{$name}/csv
 $uri = $_SERVER['REQUEST_URI'];
-if (!preg_match('#^/_/([^/?]+)/csv$#', $uri, $matches)) {
+if (!preg_match('#^/_/([^/?]+)/csv(\?purge=1)?$#', $uri, $matches)) {
     die("only allow /_/{name}/csv URL");
 }
 $id = $matches[1];
+$purge = false;
+if ($matches[2]) {
+    $purge = true;
+}
 
 // env DATABASE_URL=mysql://{user}:{pass}@{ip}/{db}
 // connect to db
@@ -51,6 +55,12 @@ $db_ip = $matches[3];
 $db_name = $matches[4];
 $db = new PDO(sprintf("mysql:host=%s;dbname=%s", $db_ip, $db_name), $db_user, $db_password);
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+if ($purge) {
+    $sql = "UPDATE cache SET cache_at = 0 WHERE id = " . $db->quote($id);
+    $db->prepare($sql)->execute();
+    exit;
+}
 
 $sql = "SELECT * FROM cache WHERE id = " . $db->quote($id);
 $stmt = $db->prepare($sql);
