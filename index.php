@@ -88,4 +88,4 @@ if ($row['cache_at'] < time() - 5 * 60) {
         printContent($row['content'], "backend error, use cache");
     }
 }
-printContent($content, "Cache hit");
+printContent($row['content'], "Cache hit");
