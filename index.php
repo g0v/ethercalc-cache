@@ -14,12 +14,13 @@ function getCSV($id, $skip_ethercalc_down = true) {
     } else {
         $cmd = sprintf("curl --fail --max-time 20 %s", escapeshellarg($url));
     }
-    $content = system($cmd, $ret);
+    exec($cmd, $output, $ret);
     if ($ret != 0) {
         file_put_contents("/tmp/ethercalc-down", time());
         error_log("ethercalc down");
         throw new Exception("fetch error");
     }
+    $content = implode("\n", $output);
     if (file_exists("/tmp/ethercalc-down")) {
         unlink("/tmp/ethercalc-down");
     }
