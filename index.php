@@ -8,19 +8,17 @@ function getCSV($id, $skip_ethercalc_down = true) {
         // if ethercalc is down in 5 minutes and $skip_ethercalc_down is true, skip it
         throw new Exception("ethercalc is down in 5 minutes");
     }
-    $curl = curl_init("https://ethercalc.net/_/{$id}/csv");
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $url = "https://ethercalc.net/_/{$id}/csv";
     if ($skip_ethercalc_down) {
-        curl_setopt($curl, CURLOPT_TIMEOUT, 3);
+        $cmd = sprintf("curl --fail --max-time 3 %s", escapeshellarg($url));
     } else {
-        curl_setopt($curl, CURLOPT_TIMEOUT, 20);
+        $cmd = sprintf("curl --fail --max-time 20 %s", escapeshellarg($url));
     }
-    $content = curl_exec($curl);
-    $info = curl_getinfo($curl);
-    if (200 != $info['http_code']) {
+    $content = system($cmd, $ret);
+    if ($ret != 0) {
         file_put_contents("/tmp/ethercalc-down", time());
         error_log("ethercalc down");
-        throw new Exception("fetch error: " . curl_error($curl));
+        throw new Exception("fetch error");
     }
     if (file_exists("/tmp/ethercalc-down")) {
         unlink("/tmp/ethercalc-down");
@@ -31,7 +29,7 @@ function getCSV($id, $skip_ethercalc_down = true) {
 function printContent($content, $header_note) {
     header('Access-Control-Allow-Methods: GET');
     header('Access-Control-Allow-Origin: *');
-    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Type: text/plain; charset=utf-8');
     header('X-Cache-Status: ' . $header_note);
 
     echo $content;
